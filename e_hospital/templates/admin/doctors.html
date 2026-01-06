@@ -1,0 +1,79 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<br><br>
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between mb-4">
+        <h3 class="fw-bold text-primary">👨‍⚕️ Doctors List</h3>
+
+        <a href="{% url 'admin_panel:doctor_add' %}" class="btn btn-success">
+            ➕ Add Doctor
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-primary">
+                    <tr>
+                       
+                        <th>Name</th>
+                        <th>Qualifications</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Clinic Address</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for d in doctors %}
+                    <tr>
+                       
+
+                        <!-- NAME -->
+                        <td class="fw-bold">{{ d.user.get_full_name|default:d.user.username }}</td>
+
+                        <!-- QUALIFICATIONS -->
+                        <td>{{ d.qualifications|default:"—" }}</td>
+
+                        <!-- EMAIL -->
+                        <td>{{ d.user.email }}</td>
+
+                        <!-- PHONE -->
+                        <td>{{ d.phone|default:"—" }}</td>
+
+                        <!-- ADDRESS -->
+                        <td>{{ d.clinic_address|default:"—" }}</td>
+
+                        <!-- ACTIONS -->
+                        <td class="text-center">
+
+                            <!-- Edit -->
+                            <a href="{% url 'admin_panel:doctor_edit' d.user.id %}" 
+                               class="btn btn-sm btn-primary">
+                                Edit
+                            </a>
+
+                            <!-- Delete -->
+                            <a href="{% url 'admin_panel:doctor_delete' d.user.id %}" 
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('Are you sure you want to delete this doctor?')">
+                                Delete
+                            </a>
+
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

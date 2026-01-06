@@ -1,0 +1,21 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<br><br>
+
+<div class="container col-md-5">
+    <div class="card shadow-sm p-4 text-center">
+
+        <h4 class="fw-bold text-danger">⚠ Are you sure?</h4>
+        <p class="mt-2">You are about to {{ type }}:</p>
+        <h5 class="fw-bold">{{ object }}</h5>
+
+        <form method="post" class="mt-4">
+            {% csrf_token %}
+            <button class="btn btn-danger w-100 mb-2">Yes, Continue</button>
+        </form>
+
+        <a href="javascript:history.back()" class="btn btn-secondary w-100">Cancel</a>
+    </div>
+</div>
+
+{% endblock %}

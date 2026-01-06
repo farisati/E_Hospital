@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account{% endblock %}
+{% block heading %}Create Your Account{% endblock %}
+{% block subheading %}Join E-Hospital and access all patient services{% endblock %}
+
+{% block content %}
+
+<form method="post">
+    {% csrf_token %}
+
+    <!-- Display form errors -->
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        Please fix the errors below.
+    </div>
+    {% endif %}
+
+    <!-- Render each field with labels -->
+    {% for field in form %}
+        <div class="mb-3">
+            <label class="form-label">{{ field.label }}</label>
+            {{ field }}
+            <small class="text-danger">{{ field.errors|striptags }}</small>
+        </div>
+    {% endfor %}
+
+    <button class="btn-primary-custom">Register</button>
+</form>
+
+<div class="footer-link">
+    Already have an account?
+    <a href="{% url 'accounts:login' %}">Login</a>
+</div>
+
+{% endblock %}

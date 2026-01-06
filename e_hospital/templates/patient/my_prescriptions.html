@@ -1,0 +1,38 @@
+{% extends 'patient/patient_base.html' %}
+{% block content %}
+
+<div class="container py-4">
+    <h3 class="fw-bold text-primary mb-4">💊 My Prescriptions</h3>
+
+    {% if prescriptions %}
+        {% for p in prescriptions %}
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+
+                <h5 class="fw-bold text-dark">
+                    {{ p.medication }}
+                </h5>
+
+                <p class="mb-2 text-muted">
+                    {{ p.instructions|default:"No instructions provided" }}
+                </p>
+
+                <div class="d-flex justify-content-between">
+                    <span class="badge bg-info text-dark">
+                        Record Date: {{ p.record.created_at|date:"F j, Y" }}
+                    </span>
+
+                    <span class="badge bg-secondary">
+                        Dr. {{ p.record.doctor.get_full_name|default:p.record.doctor.username }}
+                    </span>
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-warning">No prescriptions found.</div>
+    {% endif %}
+</div>
+
+{% endblock %}

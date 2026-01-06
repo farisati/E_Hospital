@@ -1,0 +1,95 @@
+{% extends "doctor/doctor_base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+<div class="row">
+
+<!-- ================= PATIENT INFO ================= -->
+<div class="col-md-4">
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h6 class="mb-0">👤 Patient Profile</h6>
+        </div>
+        <div class="card-body">
+            <p><b>Name:</b> {{ appt.patient.get_full_name|default:appt.patient.username }}</p>
+            <p><b>Email:</b> {{ appt.patient.email }}</p>
+            <p><b>Appointment Date:</b> {{ appt.date }}</p>
+            <p><b>Time:</b> {{ appt.time }}</p>
+            <p><b>Status:</b>
+                <span class="badge bg-info">{{ appt.get_status_display }}</span>
+            </p>
+            <a href="{% url 'doctor:patient_medical_history' appt.id %}"
+   class="btn btn-outline-primary btn-sm">
+   🗂 Medical History
+</a>
+        </div>
+    </div>
+</div>
+
+<!-- ================= CONSULTATION ================= -->
+<div class="col-md-8">
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h6 class="fw-bold mb-0">🩺 Consultation</h6>
+        </div>
+        <div class="card-body">
+
+            <p><b>Reason:</b></p>
+            <p class="text-muted">{{ appt.reason|default:"No reason provided" }}</p>
+
+            <hr>
+{# ================= BEFORE CONSULTATION ================= #}
+{% if appt.status == "confirmed" and not has_record %}
+    <a href="{% url 'doctor:start_consultation' appt.id %}"
+       class="btn btn-success">
+       ▶ Start Consultation
+    </a>
+    
+{% endif %}
+
+
+{# ================= DURING CONSULTATION ================= #}
+{% if appt.status == "confirmed" and has_record %}
+
+    <a href="{% url 'doctor:edit_medical_record' appt.id %}"
+       class="btn btn-warning">
+       📝 Add / Edit Diagnosis
+    </a>
+    
+    <a href="{% url 'doctor:create_prescription' appt.id %}"
+       class="btn btn-success">
+       ➕ Create Prescription
+    </a>
+
+    <a href="{% url 'doctor:view_prescription' appt.id %}"
+       class="btn btn-info">
+       👁 View Prescription
+    </a>
+
+    <a href="{% url 'doctor:complete_appointment' appt.id %}"
+       class="btn btn-danger"
+       onclick="return confirm('Mark appointment as completed?');">
+       ✅ Mark Completed
+    </a>
+{% endif %}
+
+{# ================= AFTER COMPLETION ================= #}
+{% if appt.status == "completed" %}
+    <a href="{% url 'doctor:view_prescription' appt.id %}"
+       class="btn btn-outline-primary">
+       👁 View Prescription
+    </a>
+{% endif %}
+
+
+
+
+        </div>
+    </div>
+</div>
+
+</div>
+</div>
+
+{% endblock %}

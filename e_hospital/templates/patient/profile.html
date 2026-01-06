@@ -1,0 +1,85 @@
+{% extends "patient/patient_base.html" %}
+{% block content %}
+
+<div class="container" style="max-width: 850px;">
+
+    <!-- Profile Header -->
+    <div style="background:#1f2937;padding:25px;border-radius:10px;color:white;text-align:center;margin-bottom:25px;">
+        <h2 style="margin-bottom:8px;font-weight:600;">My Profile</h2>
+        <p style="opacity:0.8;">Manage your personal and contact information</p>
+    </div>
+
+    <!-- Profile Card -->
+    <div style="
+        background:white;
+        padding:25px;
+        border-radius:10px;
+        box-shadow:0 4px 10px rgba(0,0,0,0.08);
+        margin-bottom:30px;">
+        
+        <h4 style="font-weight:600;margin-bottom:20px;">👤 Personal Details</h4>
+
+        <div style="margin-bottom:15px;">
+            <label style="font-weight:600;color:#374151;">Full Name:</label><br>
+            <span style="color:#1f2937;font-size:17px;">
+                {{ user.get_full_name|default:user.username }}
+            </span>
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <label style="font-weight:600;color:#374151;">Username:</label><br>
+            <span style="color:#1f2937;font-size:17px;">{{ user.username }}</span>
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <label style="font-weight:600;color:#374151;">Email:</label><br>
+            <span style="color:#1f2937;font-size:17px;">
+                {{ user.email|default:"Not provided" }}
+            </span>
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <label style="font-weight:600;color:#374151;">Phone:</label><br>
+            <span style="color:#1f2937;font-size:17px;">
+                {{ profile.phone|default:"Not provided" }}
+            </span>
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <label style="font-weight:600;color:#374151;">Address:</label><br>
+            <span style="color:#1f2937;font-size:17px;">
+                {{ profile.address|default:"Not provided" }}
+            </span>
+        </div>
+
+        <a href="{% url 'patient:edit_profile' %}" 
+           style="display:inline-block;background:#0ea5e9;color:white;padding:10px 18px;
+                  border-radius:6px;text-decoration:none;margin-top:12px;">
+            ✏️ Edit Profile
+        </a>
+    </div>
+
+    <!-- Insurance Section -->
+    <div style="
+        background:white;
+        padding:25px;
+        border-radius:10px;
+        box-shadow:0 4px 10px rgba(0,0,0,0.08);">
+
+        <h4 style="font-weight:600;margin-bottom:20px;">🏥 Insurance Details</h4>
+
+        {% if insurance %}
+            <p><strong>Provider:</strong> {{ insurance.provider }}</p>
+            <p><strong>Policy Number:</strong> {{ insurance.policy_number }}</p>
+            <p><strong>Coverage:</strong> {{ insurance.coverage_percent }}%</p>
+            <p><strong>Expiry Date:</strong> {{ insurance.expiry_date }}</p>
+        {% else %}
+            <div style="background:#fee2e2;color:#b91c1c;padding:15px;border-radius:8px;">
+                No insurance linked to your account.
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

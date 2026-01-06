@@ -1,0 +1,88 @@
+{% extends 'patient/patient_base.html' %}
+{% block content %}
+
+<h2 class="mb-4" style="font-weight:600;">Billing Records</h2>
+
+
+<table width="100%" cellpadding="10" cellspacing="0"
+       style="border-collapse:collapse;font-size:15px;border:1px solid #d1d5db;">
+    <thead>
+        <tr style="background:#1f2937;color:white;text-align:left;">
+            <th>ID</th>
+            <th>Patient</th>
+            <th>Total Amount</th>
+            <th>Insurance</th>
+            <th>Insurance Covered</th>
+            <th>Due Amount</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for bill in bills %}
+        <tr style="border-bottom:1px solid #e5e7eb;">
+
+            <!-- ID -->
+            <td><strong>#{{ bill.id }}</strong></td>
+
+            <!-- Patient -->
+            <td>{{ bill.patient.get_full_name|default:bill.patient.username }}</td>
+
+            <!-- Total Amount -->
+            <td style="color:#1d4ed8;font-weight:600;">₹ {{ bill.amount }}</td>
+
+            <!-- Insurance Provider -->
+            <td>
+                {% if bill.insurance %}
+                    {{ bill.insurance.provider }}
+                {% else %}
+                    <span style="color:#6b7280;">No Insurance</span>
+                {% endif %}
+            </td>
+
+            <!-- Insurance Covered -->
+            <td>
+                {% if bill.insurance_covered_amount %}
+                    ₹ {{ bill.insurance_covered_amount }}
+                {% else %}
+                    <span style="color:#6b7280;">-</span>
+                {% endif %}
+            </td>
+
+            <!-- Due Amount -->
+            <td>
+                <strong style="{% if bill.amount_due > 0 %}color:#dc2626;{% else %}color:#059669;{% endif %}">
+                    ₹ {{ bill.amount_due }}
+                </strong>
+            </td>
+
+            <!-- STATUS (Paid / Unpaid only) -->
+            <td>
+                {% if bill.status == 'paid' %}
+                    <span style="background:#16a34a;color:white;padding:4px 10px;border-radius:4px;">Paid</span>
+                {% else %}
+                    <span style="background:#dc2626;color:white;padding:4px 10px;border-radius:4px;">Unpaid</span>
+                {% endif %}
+            </td>
+
+            <!-- Action -->
+            <td>
+                <a href="{% url 'patient:billing_detail' bill.id %}"
+                   style="background:#0ea5e9;color:white;padding:5px 12px;text-decoration:none;border-radius:4px;">
+                    View
+                </a>
+            </td>
+
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="8" style="text-align:center;color:#6b7280;padding:14px;">
+                No billing records found.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,44 @@
+<h2>Make Payment</h2>
+
+<!-- BILL SUMMARY -->
+<div style="padding:12px; border:1px solid #ccc; background:#f8fafc; margin-bottom:15px; width:350px;">
+    <p><b>Description:</b> {{ bill.description }}</p>
+    <p><b>Total Amount:</b> ₹{{ bill.amount }}</p>
+
+    {% if bill.insurance %}
+        <p><b>Insurance Covered:</b> ₹{{ bill.insurance_covered_amount }}</p>
+    {% endif %}
+
+    <p><b><span style="color:#dc2626;">Amount Due:</span></b> ₹{{ bill.amount_due }}</p>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <!-- PAYMENT AMOUNT (READ ONLY, FULL PAYMENT ONLY) -->
+    <label><b>Amount to Pay (Full Amount):</b></label><br>
+    <input type="text" 
+           value="{{ bill.amount_due }}" 
+           readonly
+           style="background:#e5e7eb; padding:6px; width:200px;">
+
+    <!-- Hidden input to send amount to backend -->
+    <input type="hidden" name="amount" value="{{ bill.amount_due }}">
+
+    <br><br>
+
+    <!-- PAYMENT METHOD -->
+    <label><b>Payment Method:</b></label><br>
+    <select name="method" required style="padding:6px; width:200px;">
+        <option value="cash">Cash</option>
+        <option value="card">Card</option>
+        <option value="upi">UPI</option>
+    </select>
+
+    <br><br>
+
+    <button type="submit" 
+            style="background:#16a34a;color:white;padding:8px 14px;border:none;border-radius:4px;">
+        Pay Now
+    </button>
+</form>

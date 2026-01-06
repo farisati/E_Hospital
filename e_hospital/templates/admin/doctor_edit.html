@@ -1,0 +1,19 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<br><br>
+
+<div class="container col-md-6">
+    <h3 class="fw-bold text-primary mb-3">✏️ Edit Doctor</h3>
+
+    <div class="card shadow-sm p-4">
+        <form method="post">
+            {% csrf_token %}
+            {{ user_form.as_p }}
+            {{ profile_form.as_p }}
+
+            <button class="btn btn-success w-100 mt-3">Update Doctor</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

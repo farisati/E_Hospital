@@ -1,0 +1,88 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<br>
+<br>
+
+<h4 class="text-warning mt-4">⏳ Pending Appointments</h4>
+<table class="table table-striped">
+<thead class="table-warning">
+<tr>
+    <th>Date</th><th>Time</th><th>Patient</th><th>Doctor</th><th>Action</th>
+</tr>
+</thead>
+<tbody>
+{% for appt in pending %}
+<tr>
+    <td>{{ appt.date }}</td>
+    <td>{{ appt.time }}</td>
+    <td>{{ appt.patient.username }}</td>
+    <td>{{ appt.doctor.username|default:"— Not Assigned —" }}</td>
+    <td>
+        <a href="{% url 'admin_panel:approve_appointment' appt.pk %}"
+           class="btn btn-sm btn-primary">Approve / Reject</a>
+    </td>
+    <td>
+  
+</td>
+</tr>
+{% empty %}
+<tr><td colspan="5" class="text-muted">No pending appointments</td></tr>
+{% endfor %}
+</tbody>
+</table>
+
+<h4 class="text-success mt-5">✅ Confirmed Appointments</h4>
+<table class="table table-striped">
+<thead class="table-success">
+<tr>
+    <th>Date</th><th>Time</th><th>Patient</th><th>Doctor</th><th>Action</th>
+</tr>
+</thead>
+<tbody>
+{% for appt in confirmed %}
+<tr>
+    <td>{{ appt.date }}</td>
+    <td>{{ appt.time }}</td>
+    <td>{{ appt.patient.username }}</td>
+    <td>{{ appt.doctor.username }}</td>
+    <td>
+  <a href="{% url 'admin_panel:appointment_detail' appt.pk %}"
+     class="btn btn-sm btn-outline-success">
+     View
+  </a>
+</td>
+</tr>
+{% empty %}
+<tr><td colspan="4" class="text-muted">No confirmed appointments</td></tr>
+{% endfor %}
+</tbody>
+</table>
+
+<h4 class="text-secondary mt-5">🏁 Completed Appointments</h4>
+<table class="table table-striped">
+<thead class="table-secondary">
+<tr>
+    <th>Date</th><th>Time</th><th>Patient</th><th>Doctor</th><th>Action</th>
+</tr>
+</thead>
+<tbody>
+{% for appt in completed %}
+<tr>
+    <td>{{ appt.date }}</td>
+    <td>{{ appt.time }}</td>
+    <td>{{ appt.patient.username }}</td>
+    <td>{{ appt.doctor.username }}</td>
+    <td>
+  <a href="{% url 'admin_panel:appointment_detail' appt.pk %}"
+     class="btn btn-sm btn-outline-secondary">
+     View
+  </a>
+</td>
+</tr>
+{% empty %}
+<tr><td colspan="4" class="text-muted">No completed appointments</td></tr>
+{% endfor %}
+</tbody>
+</table>
+
+{% endblock %}

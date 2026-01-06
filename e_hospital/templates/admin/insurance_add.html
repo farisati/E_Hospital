@@ -1,0 +1,55 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<br>
+<br>
+<div class="container">
+    <h2 class="mb-4">Add Insurance</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label>Patient</label>
+            <select name="patient" class="form-control">
+                {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Provider</label>
+            <input type="text" name="provider" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Policy Number</label>
+            <input type="text" name="policy_number" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Coverage Percentage (%)</label>
+            <input type="number" name="coverage_percent" class="form-control" min="0" max="100" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Coverage Details</label>
+            <input type="text" name="coverage_details" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Expiry Date</label>
+            <input type="date" name="expiry_date" class="form-control">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Insurance</button>
+        <a href="{% url 'admin_panel:insurance_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

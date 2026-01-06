@@ -1,0 +1,100 @@
+{% extends 'doctor/doctor_base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- PAGE TITLE -->
+    <div class="row mb-4">
+        <div class="col">
+            <h3 class="fw-bold text-primary">👨‍⚕️ Doctor Profile</h3>
+            <p class="text-muted">View your professional information</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- LEFT CARD : BASIC INFO -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+
+                    <!-- PROFILE IMAGE -->
+                     {% if doctor.profile_image %}
+                       <img src="{{ doctor.profile_image.url }}"
+                           class="rounded-circle mb-3"
+                           width="120"
+                           height="120"
+                           alt="Doctor Photo">
+                    {% else %}
+                       <img src="{% static 'images/default-doctor.png' %}"
+                          class="rounded-circle mb-3"
+                          width="120"
+                          height="120"
+                          alt="Default Doctor">
+                    {% endif %}
+
+                    <h5 class="fw-bold mb-0">
+                        Dr. {{ doctor.user.username }}
+                    </h5>
+
+                    <p class="text-muted mb-1">
+                        {{ doctor.department|default:"No Department Assigned" }}
+                    </p>
+
+                    <span class="badge bg-success">Active</span>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT CARD : DETAILS -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    <h5 class="fw-bold mb-3">📋 Professional Details</h5>
+
+                    <div class="row mb-2">
+                        <div class="col-sm-4 fw-semibold">Qualifications</div>
+                        <div class="col-sm-8">
+                            {{ doctor.qualifications|default:"Not Provided" }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-sm-4 fw-semibold">Phone</div>
+                        <div class="col-sm-8">
+                            {{ doctor.phone|default:"Not Provided" }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-sm-4 fw-semibold">Clinic Address</div>
+                        <div class="col-sm-8">
+                            {{ doctor.clinic_address|default:"Not Provided" }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4 fw-semibold">Bio</div>
+                        <div class="col-sm-8">
+                            {{ doctor.bio|default:"No bio available" }}
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- ACTION BUTTONS -->
+                    <div class="text-end">
+                        <a href="{% url 'doctor:profile_edit' %}" class="btn btn-primary">
+                            ✏️ Edit Profile
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

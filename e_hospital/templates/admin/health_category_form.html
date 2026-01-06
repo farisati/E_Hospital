@@ -1,0 +1,15 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<br><br>
+
+<h3>Add Health Category</h3>
+
+<form method="post">
+    {% csrf_token %}
+
+    <input type="text" name="name" placeholder="Category name" required>
+
+    <button type="submit">Save</button>
+</form>
+
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Edit Insurance</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label>Patient</label>
+            <input type="text" class="form-control" value="{{ insurance.patient.username }}" disabled>
+        </div>
+
+        <div class="mb-3">
+            <label>Provider</label>
+            <input type="text" name="provider" value="{{ insurance.provider }}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Policy Number</label>
+            <input type="text" name="policy_number" value="{{ insurance.policy_number }}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Coverage Details</label>
+            <input type="text" name="coverage_details" value="{{ insurance.coverage_details }}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+    <label>Coverage Percentage (%)</label>
+    <input type="number" name="coverage_percent" value="{{ insurance.coverage_percent }}" class="form-control" min="0" max="100" required>
+</div>
+
+        <div class="mb-3">
+            <label>Expiry Date</label>
+            <input type="date" name="expiry_date" value="{{ insurance.expiry_date }}" class="form-control">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update</button>
+        <a href="{% url 'admin_panel:insurance_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

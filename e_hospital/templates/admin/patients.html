@@ -1,0 +1,97 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<br><br>
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-primary">👥 Patients List</h3>
+        <a href="{% url 'admin_panel:patient_add' %}" class="btn btn-success">
+            ➕ Add Patient
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+
+            <table class="table table-hover table-striped mb-0 align-middle">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                        <th>Address</th>
+                        <th>Status</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for p in patients %}
+                    <tr>
+
+                        <!-- Name -->
+                        <td class="fw-semibold">
+                            {{ p.user.get_full_name|default:p.user.username }}
+                        </td>
+
+                        <!-- Email -->
+                        <td>{{ p.user.email }}</td>
+
+                        <!-- Phone -->
+                        <td>{{ p.phone|default:"—" }}</td>
+
+                        <!-- Address -->
+                        <td>{{ p.address|default:"—" }}</td>
+
+                        <!-- Status -->
+                        <td>
+                            {% if p.user.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- ACTION BUTTONS -->
+                        <td class="text-center">
+
+                            <!-- View -->
+                            <a href="{% url 'admin_panel:patient_view' p.user.id %}"
+                               class="btn btn-sm btn-info">
+                                View
+                            </a>
+
+                            <!-- Edit -->
+                            <a href="{% url 'admin_panel:patient_edit' p.user.id %}"
+                               class="btn btn-sm btn-warning">
+                                Edit
+                            </a>
+
+                            <!-- Activate / Deactivate -->
+                            {% if p.user.is_active %}
+                                <a href="{% url 'admin_panel:patient_deactivate' p.user.id %}"
+                                   class="btn btn-sm btn-danger">
+                                    Deactivate
+                                </a>
+                            {% else %}
+                                <a href="{% url 'admin_panel:patient_activate' p.user.id %}"
+                                   class="btn btn-sm btn-success">
+                                    Activate
+                                </a>
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

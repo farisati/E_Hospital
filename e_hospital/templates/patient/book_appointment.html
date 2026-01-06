@@ -1,0 +1,151 @@
+{% extends 'patient/patient_base.html' %}
+{% block content %}
+
+<style>
+.slot-btn{
+    padding:8px 15px;
+    border-radius:8px;
+    border:1px solid #0d6efd;
+    background:white;
+    margin:4px;
+    cursor:pointer;
+}
+.slot-btn:hover{
+    background:#e6f0ff;
+}
+.slot-btn.selected{
+    background:#0d6efd;
+    color:white;
+    font-weight:bold;
+}
+</style>
+
+<div class="container mt-4">
+
+    <h3 class="fw-bold text-primary">Book Appointment</h3>
+
+    <form method="post" action="{% url 'patient:book_appointment' %}">
+        {% csrf_token %}
+
+        <!-- Doctor -->
+        <label class="fw-bold mt-3">Select Doctor</label>
+        {{ form.doctor }}
+
+        <!-- Date -->
+        <label class="fw-bold mt-3">Select Date</label>
+        <select name="date" id="dateField" class="form-control">
+            <option value="">Select doctor first</option>
+        </select>
+
+        <!-- Hidden Time -->
+        <input type="hidden" name="time" id="selectedTime">
+
+        <!-- Slots -->
+        <h5 class="mt-4 fw-bold">Available Slots</h5>
+        <div id="slotContainer" class="p-2 border rounded">
+            <p class="text-muted">Select doctor & date</p>
+        </div>
+
+        <!-- Reason -->
+        <label class="fw-bold mt-3">Reason</label>
+        {{ form.reason }}
+
+        <!-- Submit -->
+        <button class="btn btn-success mt-3" type="submit"
+        onclick="
+        if(!document.getElementById('selectedTime').value){
+            alert('Please select a time slot');
+            return false;
+        }">
+            Book Appointment
+        </button>
+
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    const doctor = document.getElementById("id_doctor");
+    const dateField = document.getElementById("dateField");
+    const slotContainer = document.getElementById("slotContainer");
+    const selectedTime = document.getElementById("selectedTime");
+
+    // Doctor change → load dates
+    doctor.onchange = () => {
+
+        dateField.innerHTML = '<option value="">Loading dates...</option>';
+        slotContainer.innerHTML = '<p class="text-muted">Select date</p>';
+        selectedTime.value = "";
+
+        if (!doctor.value) {
+            dateField.innerHTML = '<option value="">Select valid doctor</option>';
+            return;
+        }
+
+        fetch(`/patient/get-available-dates/?doctor=${doctor.value}`)
+        .then(res => res.json())
+        .then(data => {
+
+            dateField.innerHTML = '';
+
+            if (!data.dates || data.dates.length === 0) {
+                dateField.innerHTML = '<option value="">No available dates</option>';
+                return;
+            }
+
+            dateField.innerHTML = '<option value="">Select date</option>';
+            data.dates.forEach(d => {
+                dateField.innerHTML += `<option value="${d}">${d}</option>`;
+            });
+        })
+        .catch(() => {
+            dateField.innerHTML = '<option value="">Error loading dates</option>';
+        });
+    };
+
+    // Date change → load slots
+    dateField.onchange = () => {
+
+        selectedTime.value = "";
+        slotContainer.innerHTML = '<p class="text-muted">Loading slots...</p>';
+
+        if (!dateField.value) return;
+
+        fetch(`/patient/get-available-slots/?doctor=${doctor.value}&date=${dateField.value}`)
+        .then(res => res.json())
+        .then(data => {
+
+            slotContainer.innerHTML = '';
+
+            if (!data.slots || data.slots.length === 0) {
+                slotContainer.innerHTML =
+                    '<p class="text-danger">No slots available</p>';
+                return;
+            }
+
+            data.slots.forEach(t => {
+                slotContainer.innerHTML += `
+                    <button type="button"
+                            class="slot-btn"
+                            data-time="${t}">
+                        ${t}
+                    </button>`;
+            });
+
+            document.querySelectorAll(".slot-btn").forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll(".slot-btn")
+                        .forEach(b => b.classList.remove("selected"));
+
+                    btn.classList.add("selected");
+                    selectedTime.value = btn.dataset.time;
+                };
+            });
+        });
+    };
+
+});
+</script>
+
+{% endblock %}

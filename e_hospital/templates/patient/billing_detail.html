@@ -1,0 +1,81 @@
+{% extends 'patient/patient_base.html' %}
+{% block content %}
+
+<div class="container py-4">
+
+    <h3 class="fw-bold text-primary mb-3">🧾 Billing Details</h3>
+
+    <div class="card shadow-sm p-4 mb-4">
+        <h5 class="fw-bold mb-3">Invoice #{{ bill.id }}</h5>
+
+        <p><b>Patient:</b> {{ bill.patient.get_full_name|default:bill.patient.username }}</p>
+        <p><b>Description:</b> {{ bill.description }}</p>
+        <p><b>Total Amount:</b> ₹{{ bill.amount }}</p>
+
+        {% if bill.insurance %}
+            <p><b>Insurance Provider:</b> {{ bill.insurance.provider }}</p>
+            <p><b>Insurance Covered:</b> ₹{{ bill.insurance_covered_amount }}</p>
+        {% endif %}
+
+        <p class="fw-bold {% if bill.amount_due > 0 %}text-danger{% else %}text-success{% endif %}">
+            <b>Amount Due:</b> ₹{{ bill.amount_due }}
+        </p>
+
+        <p>
+            <b>Status:</b>
+            {% if bill.status == "paid" %}
+                <span class="badge bg-success">Paid</span>
+            {% else %}
+                <span class="badge bg-warning text-dark">Unpaid</span>
+            {% endif %}
+        </p>
+
+        <div class="mt-3">
+            {% if bill.status == "unpaid" %}
+                <a href="{% url 'patient:pay_bill' bill.id %}" class="btn btn-success">
+                    💳 Pay Now
+                </a>
+            {% endif %}
+
+            <a href="{% url 'patient:billing_list' %}" class="btn btn-secondary">
+                ⬅ Back to Billing
+            </a>
+        </div>
+    </div>
+
+    <!-- Payment History -->
+    <h4 class="fw-bold mb-2">Payment History</h4>
+
+    {% if payments %}
+    <table class="table table-hover shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for p in payments %}
+            <tr>
+                <td>₹{{ p.amount }}</td>
+                <td>{{ p.get_method_display }}</td>
+                <td>
+                    <span class="badge bg-success">Paid</span>
+                </td>
+                <td>{{ p.paid_at|date:"d M Y" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="alert alert-info">
+            No payments made yet.
+        </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

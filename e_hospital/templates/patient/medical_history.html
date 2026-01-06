@@ -1,0 +1,58 @@
+{% extends 'patient/patient_base.html' %}
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- Page Title -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-primary m-0">📋 My Medical Records</h3>
+    </div>
+
+    {% if records %}
+        {% for r in records %}
+        <div class="card border-0 shadow-sm mb-4 rounded-3">
+
+            <div class="card-body">
+
+                <!-- Date & Doctor -->
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="fw-semibold text-dark m-0">
+                        🗓 {{ r.created_at|date:"F j, Y" }}
+                    </h5>
+
+                    <span class="badge bg-light text-dark border">
+                        👨‍⚕️ {{ r.doctor.get_full_name|default:r.doctor.username }}
+                    </span>
+                </div>
+
+                <!-- Diagnosis -->
+                <div class="mb-2">
+                    <strong class="text-secondary">Diagnosis:</strong>
+                    <span class="text-dark">{{ r.diagnosis|default:"Not Available" }}</span>
+                </div>
+
+                <!-- Notes Preview -->
+                <p class="text-muted small mb-3">
+                    {{ r.notes|truncatechars:150 }}
+                </p>
+
+                <!-- View Button -->
+                <div class="text-end">
+                    <a href="{% url 'patient:record_detail' r.id %}"
+                       class="btn btn-primary btn-sm px-4 rounded-pill">
+                        View Details →
+                    </a>
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+
+    {% else %}
+        <div class="alert alert-warning text-center py-3 rounded-3 shadow-sm">
+            No medical records found.
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

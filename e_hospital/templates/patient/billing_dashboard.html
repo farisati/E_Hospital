@@ -1,0 +1,205 @@
+{% extends 'patient/patient_base.html' %}
+{% block content %}
+
+<div class="container py-4">
+
+    <h3 class="fw-bold text-primary mb-4">💳 Billing & Payments</h3>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm text-center p-3">
+                <h5 class="fw-bold">Pending Bills</h5>
+                <p class="display-6 text-warning">{{ pending_count }}</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm text-center p-3">
+                <h5 class="fw-bold">Paid Bills</h5>
+                <p class="display-6 text-success">{{ paid_count }}</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm text-center p-3">
+                <h5 class="fw-bold">Total Bills</h5>
+                <p class="display-6 text-info">{{ total_count }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link active" href="#pending" data-bs-toggle="tab">Pending Payments</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#history" data-bs-toggle="tab">Billing History</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+
+        <!-- PENDING PAYMENTS TAB -->
+        <div class="tab-pane fade show active" id="pending">
+
+            <h4 class="fw-bold mb-3 text-primary">
+                <i class="bi bi-hourglass-split"></i> Pending Payments
+            </h4>
+
+            {% if pending_bills %}
+            <div class="card shadow-sm">
+                <div class="card-body p-0">
+
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-dark text-center">
+                            <tr>
+                                <th>Description</th>
+                                <th>Total Amount</th>
+                                <th>Insurance Covered</th>
+                                <th>Amount Due</th>
+                                <th>Created</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for bill in pending_bills %}
+                            <tr>
+                                <td class="fw-semibold">{{ bill.description }}</td>
+
+                                <td class="text-end text-primary fw-bold">
+                                    ₹ {{ bill.amount }}
+                                </td>
+
+                                <td class="text-end text-info">
+                                    {% if bill.insurance_covered_amount %}
+                                        ₹ {{ bill.insurance_covered_amount }}
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+
+                                <td class="text-end fw-bold text-danger">
+                                    ₹ {{ bill.amount_due }}
+                                </td>
+
+                                <td class="text-center">
+                                    {{ bill.created_at|date:"d M Y" }}
+                                </td>
+
+                                <td class="text-center">
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="bi bi-clock-history"></i> Unpaid
+                                    </span>
+                                </td>
+
+                                <td class="text-center">
+                                    <a href="{% url 'patient:pay_bill' bill.id %}"
+                                       class="btn btn-success btn-sm">
+                                       <i class="bi bi-wallet2"></i> Pay Now
+                                    </a>
+                                </td>
+
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+
+            {% else %}
+            <div class="alert alert-warning text-center mt-3">
+                <i class="bi bi-exclamation-circle"></i>
+                No pending bills.
+            </div>
+            {% endif %}
+
+        </div>
+
+        <!-- BILLING HISTORY TAB -->
+        <div class="tab-pane fade" id="history">
+
+            <h4 class="fw-bold mb-3 text-primary">
+                <i class="bi bi-receipt-cutoff"></i> Billing History
+            </h4>
+
+            {% with history_bills=all_bills.filter(status="paid") %}
+            {% if history_bills %}
+            <div class="card shadow-sm">
+                <div class="card-body p-0">
+
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-dark text-center">
+                            <tr>
+                                <th>Description</th>
+                                <th>Total Amount</th>
+                                <th>Insurance Covered</th>
+                                <th>Amount Paid</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Invoice</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for bill in history_bills %}
+                            <tr>
+
+                                <td class="fw-semibold">{{ bill.description }}</td>
+
+                                <td class="text-end text-primary fw-bold">
+                                    ₹ {{ bill.amount }}
+                                </td>
+
+                                <td class="text-end text-info">
+                                    {% if bill.insurance_covered_amount %}
+                                        ₹ {{ bill.insurance_covered_amount }}
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Amount Paid = full bill amount_due at the time of payment -->
+                                <td class="text-end text-success fw-semibold">
+                                    ₹ {{ bill.amount - bill.insurance_covered_amount }}
+                                </td>
+
+                                <td class="text-center">{{ bill.created_at|date:"d M Y" }}</td>
+
+                                <td class="text-center">
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle"></i> Paid
+                                    </span>
+                                </td>
+
+                                <td class="text-center">
+                                    <a class="btn btn-sm btn-outline-primary"
+                                       href="{% url 'patient:invoice_view' bill.id %}">
+                                       <i class="bi bi-file-earmark-text"></i> View
+                                    </a>
+                                </td>
+
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </div>
+
+            {% else %}
+            <div class="alert alert-info text-center mt-3">
+                <i class="bi bi-info-circle"></i> No billing history found.
+            </div>
+            {% endif %}
+            {% endwith %}
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

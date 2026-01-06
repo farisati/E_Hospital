@@ -1,0 +1,11 @@
+{% extends 'doctor/doctor_base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h3>Add / Edit Availability</h3>
+  <form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-success" type="submit">Save</button>
+    <a class="btn btn-secondary" href="{% url 'doctor:manage_availability' %}">Back</a>
+  </form>
+</div>
+{% endblock %}

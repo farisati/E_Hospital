@@ -1,0 +1,82 @@
+<h2>Create Billing</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    
+    <!-- Patient -->
+    <label><b>Patient:</b></label>
+    {{ form.patient }}
+
+    <!-- Insurance Info Box -->
+    <div id="insurance-info" 
+         style="display:none; margin-top:10px; padding:10px; border:1px solid #ccc; background:#f3f4f6;">
+        <p><strong>Insurance Found!</strong></p>
+        <p>Provider: <span id="ins-provider"></span></p>
+        <p>Coverage: <span id="ins-coverage"></span>%</p>
+    </div>
+
+    <br>
+
+    <!-- Total Amount -->
+    <label><b>Total Amount:</b></label>
+    {{ form.total_amount }}
+
+    <br><br>
+
+    <!-- Insurance Amount -->
+    <label><b>Insurance Covers:</b></label>
+    <input type="text" id="insurance_amount" readonly 
+           style="background:#e5e7eb; padding:5px; width:200px;">
+
+    <!-- Payable Amount -->
+    <label style="margin-left:20px;"><b>Patient Pays:</b></label>
+    <input type="text" id="patient_payable" readonly 
+           style="background:#e5e7eb; padding:5px; width:200px;">
+
+    <br><br>
+
+    <button type="submit" style="padding:8px 16px; background:#2563eb; color:white; border:none; border-radius:4px;">
+        Create Bill
+    </button>
+</form>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const patientSelect = document.getElementById("id_patient");
+    const totalAmountInput = document.getElementById("id_total_amount");
+
+    // Fetch insurance details automatically
+    patientSelect.addEventListener("change", function() {
+        fetch(`/get-insurance/${this.value}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.has_insurance) {
+                    document.getElementById("insurance-info").style.display = "block";
+                    document.getElementById("ins-provider").innerText = data.provider;
+                    document.getElementById("ins-coverage").innerText = data.coverage;  
+                } else {
+                    document.getElementById("insurance-info").style.display = "none";
+                    document.getElementById("ins-coverage").innerText = 0;
+                }
+
+                // Trigger calculation if amount already entered
+                totalAmountInput.dispatchEvent(new Event("input"));
+            });
+    });
+
+    // Auto calculate insurance + payable amount
+    totalAmountInput.addEventListener("input", function() {
+        const total = parseFloat(this.value) || 0;
+        const coverage = parseFloat(document.getElementById("ins-coverage").innerText) || 0;
+
+        const insuranceAmount = (total * coverage) / 100;
+        const patientPayable = total - insuranceAmount;
+
+        document.getElementById("insurance_amount").value = insuranceAmount.toFixed(2);
+        document.getElementById("patient_payable").value = patientPayable.toFixed(2);
+    });
+
+});
+</script>

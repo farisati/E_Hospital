@@ -1,0 +1,105 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<br><br>
+
+<h3 class="mb-3">{% if edit %}Edit Bill{% else %}Create Bill{% endif %}</h3>
+
+<form method="post" id="billingForm">
+  {% csrf_token %}
+
+  <!-- Patient Selection -->
+  <div class="card shadow-sm p-4 mb-3">
+      {{ form.patient.label_tag }} 
+      {{ form.patient }}
+
+      <div id="insuranceInfo" class="alert alert-info mt-2" style="display:none;">
+          <b>Insurance Provider:</b> <span id="insProvider"></span><br>
+          <b>Coverage %:</b> <span id="insPercent"></span>%
+      </div>
+  </div>
+
+  <!-- Bill Entry -->
+  <div class="card shadow-sm p-4 mb-3">
+      {{ form.description.label_tag }}
+      {{ form.description }}
+
+      {{ form.amount.label_tag }}
+      {{ form.amount }}
+  </div>
+
+  <!-- Calculation Summary -->
+  <div class="card shadow-sm p-4 mb-3" id="calculationBox" style="display:none;">
+      <h5>💰 Calculation Summary</h5>
+      <p><b>Total Amount:</b> ₹<span id="totalAmount"></span></p>
+      <p><b>Insurance Covered:</b> ₹<span id="coveredAmount"></span></p>
+      <p><b>Amount Due (Full Payment):</b> ₹<span id="amountDue"></span></p>
+  </div>
+
+  <!-- Remove Status & Insurance Fields -->
+  {# These fields must NOT be shown #}
+  <style>
+      #id_status, label[for="id_status"],
+      #id_insurance, label[for="id_insurance"] {
+          display: none !important;
+      }
+  </style>
+
+  <button class="btn btn-success mt-3">Save</button>
+  <a href="{% url 'admin_panel:billing_list' %}" class="btn btn-secondary mt-3">Cancel</a>
+</form>
+
+<!-- AJAX SCRIPT TO AUTO-CALCULATE -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const patientField = document.getElementById("id_patient");
+    const amountField = document.getElementById("id_amount");
+
+    function updateInsuranceDetails() {
+        const patientId = patientField.value;
+
+        if (!patientId) return;
+
+        fetch(`/admin-panel/get-insurance/${patientId}/`)
+            .then(response => response.json())
+            .then(data => {
+
+                if (data.has_insurance) {
+                    document.getElementById("insuranceInfo").style.display = "block";
+                    document.getElementById("insProvider").innerText = data.provider;
+                    document.getElementById("insPercent").innerText = data.coverage_percent;
+                } else {
+                    document.getElementById("insuranceInfo").style.display = "none";
+                    document.getElementById("insPercent").innerText = "";
+                }
+
+                calculateAmounts();
+            });
+    }
+
+    function calculateAmounts() {
+        const amount = parseFloat(amountField.value);
+        const coverageText = document.getElementById("insPercent").innerText;
+
+        if (!amount || coverageText === "") {
+            document.getElementById("calculationBox").style.display = "none";
+            return;
+        }
+
+        const coverage = parseFloat(coverageText);
+        const covered = (amount * coverage) / 100;
+        const due = amount - covered;
+
+        document.getElementById("totalAmount").innerText = amount.toFixed(2);
+        document.getElementById("coveredAmount").innerText = covered.toFixed(2);
+        document.getElementById("amountDue").innerText = due.toFixed(2);
+
+        document.getElementById("calculationBox").style.display = "block";
+    }
+
+    patientField.addEventListener("change", updateInsuranceDetails);
+    amountField.addEventListener("input", calculateAmounts);
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,192 @@
+{% extends 'patient/patient_base.html' %}
+{% block content %}
+<div class="container mt-4">
+
+  <h2>Your Appointments</h2>
+
+  <a href="{% url 'patient:book_appointment' %}" class="btn btn-primary mb-3">
+      Book Appointment
+  </a>
+
+  <!-- Pending -->
+  <h4 class="mt-4 text-warning">⏳ Pending Appointments</h4>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Doctor</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for appt in pending %}
+      <tr>
+        <td>{{ appt.date }}</td>
+        <td>{{ appt.time }}</td>
+
+        <td>
+          {% if appt.doctor %}
+              {% if appt.doctor.get_full_name %}
+                  {{ appt.doctor.get_full_name }}
+              {% else %}
+                  {{ appt.doctor.username }}
+              {% endif %}
+          {% else %}
+              Not assigned
+          {% endif %}
+        </td>
+
+        <td><span class="badge bg-warning text-dark">Pending</span></td>
+
+        <td>
+          <a href="{% url 'patient:appointment_detail' appt.pk %}" class="btn btn-sm btn-info">View</a>
+          <a href="{% url 'patient:reschedule_appointment' appt.pk %}" class="btn btn-sm btn-warning">Reschedule</a>
+          <a href="{% url 'patient:cancel_appointment' appt.pk %}" class="btn btn-sm btn-danger">Cancel</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" class="text-center text-muted">No pending appointments.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Approved -->
+  <h4 class="mt-4 text-success">✔ Approved Appointments</h4>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Doctor</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for appt in approved %}
+      <tr>
+        <td>{{ appt.date }}</td>
+        <td>{{ appt.time }}</td>
+
+        <td>
+          {% if appt.doctor %}
+              {% if appt.doctor.get_full_name %}
+                  {{ appt.doctor.get_full_name }}
+              {% else %}
+                  {{ appt.doctor.username }}
+              {% endif %}
+          {% else %}
+              Not assigned
+          {% endif %}
+        </td>
+
+        <td><span class="badge bg-success">Approved</span></td>
+
+        <td>
+          <a href="{% url 'patient:appointment_detail' appt.pk %}" class="btn btn-sm btn-info">View</a>
+          <a href="{% url 'patient:reschedule_appointment' appt.pk %}" class="btn btn-sm btn-warning">Reschedule</a>
+          <a href="{% url 'patient:cancel_appointment' appt.pk %}" class="btn btn-sm btn-danger">Cancel</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" class="text-center text-muted">No approved appointments.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Cancelled -->
+  <h4 class="mt-4 text-danger">❌ Cancelled Appointments</h4>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Doctor</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for appt in cancelled %}
+      <tr>
+        <td>{{ appt.date }}</td>
+        <td>{{ appt.time }}</td>
+
+        <td>
+          {% if appt.doctor %}
+              {% if appt.doctor.get_full_name %}
+                  {{ appt.doctor.get_full_name }}
+              {% else %}
+                  {{ appt.doctor.username }}
+              {% endif %}
+          {% else %}
+              Not assigned
+          {% endif %}
+        </td>
+
+        <td><span class="badge bg-danger">Cancelled</span></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4" class="text-center text-muted">No cancelled appointments.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+
+
+  <!-- Completed -->
+<h4 class="mt-4 text-primary">✅ Completed Appointments</h4>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Time</th>
+      <th>Doctor</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for appt in completed %}
+    <tr>
+      <td>{{ appt.date }}</td>
+      <td>{{ appt.time }}</td>
+
+      <td>
+        {% if appt.doctor %}
+            {% if appt.doctor.get_full_name %}
+                {{ appt.doctor.get_full_name }}
+            {% else %}
+                {{ appt.doctor.username }}
+            {% endif %}
+        {% else %}
+            Not assigned
+        {% endif %}
+      </td>
+
+      <td>
+        <span class="badge bg-primary">Completed</span>
+      </td>
+
+      <td>
+        <a href="{% url 'patient:appointment_detail' appt.pk %}"
+           class="btn btn-sm btn-info">View</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="5" class="text-center text-muted">
+        No completed appointments.
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+</div>
+{% endblock %}

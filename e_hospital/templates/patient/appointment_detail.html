@@ -1,0 +1,30 @@
+{% extends 'patient/patient_base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h3>Appointment Details</h3>
+
+  <p><strong>Date:</strong> {{ appointment.date }}</p>
+  <p><strong>Time:</strong> {{ appointment.time }}</p>
+
+  <p><strong>Doctor:</strong>
+      {% if appointment.doctor %}
+          {{ appointment.doctor.get_username }}
+      {% else %}
+          Not assigned
+      {% endif %}
+  </p>
+
+  <p><strong>Department:</strong>
+      {% if appointment.department %}
+          {{ appointment.department.name }}
+      {% else %}
+          General
+      {% endif %}
+  </p>
+
+  <p><strong>Reason:</strong> {{ appointment.reason }}</p>
+  <p><strong>Status:</strong> {{ appointment.get_status_display }}</p>
+
+  <a href="{% url 'patient:appointment_list' %}" class="btn btn-secondary">Back</a>
+</div>
+{% endblock %}

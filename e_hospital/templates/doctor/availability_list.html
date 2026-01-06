@@ -1,0 +1,23 @@
+{% extends 'doctor/doctor_base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h3>Your Availability</h3>
+  <a href="{% url 'doctor:add_availability' %}" class="btn btn-primary mb-3">Add Availability</a>
+  <ul class="list-group">
+    {% for a in availabilities %}
+      <li class="list-group-item d-flex justify-content-between">
+        <div>{{ a.get_day_of_week_display }}: {{ a.start_time }} - {{ a.end_time }} ({{ a.slot_duration_minutes }} min)</div>
+        <div>
+          <a href="{% url 'doctor:edit_availability' a.pk %}" class="btn btn-sm btn-warning">Edit</a>
+          <form action="{% url 'doctor:delete_availability' a.pk %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button class="btn btn-sm btn-danger">Delete</button>
+          </form>
+        </div>
+      </li>
+    {% empty %}
+      <li class="list-group-item">You have not set availability yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<br><br>
+
+<h3 class="fw-bold mb-4">Appointment Details</h3>
+
+<table class="table table-bordered">
+<tr><th>Date</th><td>{{ appt.date }}</td></tr>
+<tr><th>Time</th><td>{{ appt.time }}</td></tr>
+<tr><th>Patient</th><td>{{ appt.patient.username }}</td></tr>
+<tr><th>Doctor</th><td>{{ appt.doctor.username|default:"Not Assigned" }}</td></tr>
+<tr><th>Status</th><td>{{ appt.get_status_display }}</td></tr>
+<tr><th>Reason</th><td>{{ appt.reason }}</td></tr>
+</table>
+
+<form method="post">
+{% csrf_token %}
+
+{% if appt.status == "pending" %}
+  <button name="action" value="approve" class="btn btn-success">
+    Approve
+  </button>
+  <button name="action" value="reject" class="btn btn-danger">
+    Reject
+  </button>
+
+{% elif appt.status == "confirmed" %}
+  <button name="action" value="complete" class="btn btn-warning">
+    Mark Completed
+  </button>
+{% endif %}
+
+<a href="{% url 'admin_panel:appointment_list' %}"
+   class="btn btn-secondary">Back</a>
+
+</form>
+
+{% endblock %}

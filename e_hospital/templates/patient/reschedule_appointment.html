@@ -1,0 +1,142 @@
+{% extends 'patient/patient_base.html' %}
+{% block content %}
+
+<style>
+.slot-btn{
+    padding:8px 15px;
+    border-radius:8px;
+    border:1px solid #0d6efd;
+    background:white;
+    margin:4px;
+    cursor:pointer;
+}
+.slot-btn.selected{
+    background:#0d6efd;
+    color:white;
+    font-weight:bold;
+}
+</style>
+
+<div class="container mt-4">
+<h3 class="fw-bold text-warning">Reschedule Appointment</h3>
+
+<form method="post"
+action="{% url 'patient:reschedule_appointment' appt.id %}">
+{% csrf_token %}
+
+<input type="text" class="form-control" 
+value="{{ appt.doctor.get_username}}" disabled>
+<input type="hidden" name="doctor" value="{{ appt.doctor.id }}">
+
+<label class="fw-bold mt-3">Select Date</label>
+<select name="date" id="dateField" class="form-control"></select>
+
+<input type="hidden" name="time" id="selectedTime"
+value="{{ appt.time|time:'H:i' }}">
+
+<h5 class="mt-4 fw-bold">Available Slots</h5>
+<div id="slotContainer" class="p-2 border rounded"></div>
+
+<label class="fw-bold mt-3">Reason</label>
+{{ form.reason }}
+
+<button class="btn btn-warning mt-3" type="submit"
+onclick="
+if(!document.getElementById('selectedTime').value){
+    alert('Please select a time slot');
+    return false;
+}">
+Update Appointment
+</button>
+</form>
+
+<!-- 🔥 IMPORTANT hidden values -->
+<input type="hidden" id="doctorId" value="{{ appt.doctor.id }}">
+<input type="hidden" id="initialDate" value="{{ appt.date|date:'Y-m-d' }}">
+<input type="hidden" id="initialTime" value="{{ appt.time|time:'H:i' }}">
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    const doctorId = document.getElementById("doctorId").value;
+    const dateField = document.getElementById("dateField");
+    const slotContainer = document.getElementById("slotContainer");
+
+    const initialDate = document.getElementById("initialDate").value;
+    const initialTime = document.getElementById("initialTime").value;
+
+    // 🛑 Safety check
+    if (!doctorId) {
+        slotContainer.innerHTML =
+            "<p class='text-danger'>Doctor not assigned</p>";
+        return;
+    }
+
+    // 1️⃣ Load available dates
+    fetch(`/patient/get-available-dates/?doctor=${doctorId}`)
+    .then(res => res.json())
+    .then(data => {
+
+        dateField.innerHTML = "";
+
+        if (!data.dates || data.dates.length === 0) {
+            dateField.innerHTML =
+                "<option value=''>No available dates</option>";
+            return;
+        }
+
+        data.dates.forEach(d => {
+            dateField.innerHTML +=
+                `<option value="${d}" ${d === initialDate ? "selected" : ""}>${d}</option>`;
+        });
+
+        // 🔥 Auto load slots for existing date
+        if (initialDate) {
+            loadSlots(initialDate);
+        }
+    });
+
+    // 2️⃣ Load slots
+    function loadSlots(date) {
+        fetch(`/patient/get-available-slots/?doctor=${doctorId}&date=${date}`)
+        .then(res => res.json())
+        .then(data => {
+
+            if (!data.slots || data.slots.length === 0) {
+                slotContainer.innerHTML =
+                    "<p class='text-danger'>No slots available</p>";
+                return;
+            }
+
+            slotContainer.innerHTML = data.slots.map(t =>
+                `<button type="button"
+                    class="slot-btn ${t === initialTime ? "selected" : ""}"
+                    data-time="${t}">
+                    ${t}
+                </button>`
+            ).join("");
+
+            document.querySelectorAll(".slot-btn").forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll(".slot-btn")
+                        .forEach(b => b.classList.remove("selected"));
+
+                    btn.classList.add("selected");
+                    document.getElementById("selectedTime").value = btn.dataset.time;
+                };
+            });
+        });
+    }
+
+    // 3️⃣ Reload slots when date changes
+    dateField.onchange = () => {
+        if (dateField.value) {
+            loadSlots(dateField.value);
+        }
+    };
+});
+</script>
+
+{% endblock %}

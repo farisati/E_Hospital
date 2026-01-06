@@ -1,0 +1,181 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<br><br>
+
+<div class="container mt-4">
+
+<div class="row">
+
+    <!-- ================= PATIENT INFO ================= -->
+    <div class="col-md-7">
+        <div class="card shadow-sm mb-4 h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">👤 Patient Profile</h5>
+            </div>
+            <div class="card-body">
+                <p><b>Name:</b> {{ profile.user.get_full_name|default:profile.user.username }}</p>
+                <p><b>Email:</b> {{ profile.user.email }}</p>
+                <p><b>Phone:</b> {{ profile.phone }}</p>
+                <p><b>Address:</b> {{ profile.address }}</p>
+                <p><b>Status:</b>
+                    {% if profile.user.is_active %}
+                        <span class="badge bg-success">Active</span>
+                    {% else %}
+                        <span class="badge bg-danger">Inactive</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= INSURANCE ================= -->
+    <div class="col-md-5">
+        <div class="card shadow-sm mb-4 h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">🛡️ Insurance</h5>
+            </div>
+            <div class="card-body">
+                {% if insurance %}
+                    <p><b>Provider:</b> {{ insurance.provider }}</p>
+                    <p><b>Policy No:</b> {{ insurance.policy_number }}</p>
+                    <p><b>Coverage:</b> {{ insurance.coverage_percent }}%</p>
+                    <p><b>Expiry:</b> {{ insurance.expiry_date }}</p>
+                {% else %}
+                    <p class="text-muted">No insurance available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+<br>
+<!-- ================= APPOINTMENTS ================= -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">📅 Appointments</h5>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Doctor</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appt in appointments %}
+                <tr>
+                    <td>{{ appt.date }}</td>
+                    <td>{{ appt.time }}</td>
+                    <td>{{ appt.doctor.get_full_name|default:"Unassigned" }}</td>
+                    <td>
+                        <span class="badge bg-secondary">{{ appt.get_status_display }}</span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center">No appointments</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ================= MEDICAL RECORDS ================= -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-warning">
+        <h5 class="mb-0">🩺 Medical Records</h5>
+    </div>
+    <div class="card-body">
+        {% for record in medical_records %}
+            <div class="border rounded p-3 mb-3">
+                <p><b>Date:</b> {{ record.created_at|date:"d M Y" }}</p>
+                <p><b>Doctor:</b> {{ record.doctor.get_full_name|default:"N/A" }}</p>
+                <p><b>Diagnosis:</b> {{ record.diagnosis }}</p>
+                <p><b>Medications:</b> {{ record.medications }}</p>
+                <p><b>Notes:</b> {{ record.notes }}</p>
+            </div>
+        {% empty %}
+            <p class="text-muted">No medical records found.</p>
+        {% endfor %}
+    </div>
+</div>
+
+
+
+<!-- ================= BILLING ================= -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">💳 Billing</h5>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-bordered mb-0">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Total</th>
+                    <th>Covered</th>
+                    <th>Due</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bill in bills %}
+                <tr>
+                    <td>{{ bill.description }}</td>
+                    <td>{{ bill.amount }}</td>
+                    <td>{{ bill.insurance_covered_amount }}</td>
+                    <td>{{ bill.amount_due }}</td>
+                    <td>
+                        <span class="badge bg-info">{{ bill.get_status_display }}</span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center">No bills</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ================= PAYMENTS ================= -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">💰 Payments</h5>
+    </div>
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pay in payments %}
+                <tr>
+                    <td>{{ pay.paid_at|date:"d M Y" }}</td>
+                    <td>{{ pay.amount }}</td>
+                    <td>{{ pay.method }}</td>
+                    <td>
+                        <span class="badge bg-success">{{ pay.get_status_display }}</span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center">No payments</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<a href="{% url 'admin_panel:patient_list' %}" class="btn btn-outline-secondary">
+    ⬅ Back to Patient List
+</a>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'patient/patient_base.html' %}
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- Title -->
+    <h3 class="fw-bold text-primary mb-4">💊 Prescription Details</h3>
+
+    <!-- Prescription Card -->
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body">
+
+            <!-- Date -->
+            <div class="mb-3">
+                <strong class="text-secondary">📅 Date Issued:</strong><br>
+                <span class="text-dark">{{ prescription.created_at|date:"F j, Y" }}</span>
+            </div>
+
+            <hr>
+
+            <!-- Medication -->
+            <div class="mb-4">
+                <strong class="text-secondary d-block mb-2">💊 Medication:</strong>
+                <pre class="bg-light p-3 rounded-3 border small text-dark" 
+                     style="white-space: pre-wrap; font-family: inherit;">
+{{ prescription.medication }}
+                </pre>
+            </div>
+
+            <hr>
+
+            <!-- Instructions -->
+            <div class="mb-4">
+                <strong class="text-secondary d-block mb-2">📝 Instructions:</strong>
+                <p class="text-dark">{{ prescription.instructions|linebreaks }}</p>
+            </div>
+
+            <!-- Back Button -->
+            <div class="text-end">
+                <a href="{% url 'patient:medical_history' %}" 
+                   class="btn btn-secondary rounded-pill px-4">
+                    ← Back to Medical History
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

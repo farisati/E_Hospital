@@ -1,0 +1,53 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<br>
+<br>
+
+<h3 class="mb-3">Record Payment</h3>
+
+<div class="card shadow-sm p-4 mb-4">
+
+    <h5 class="fw-bold">🧾 Bill Summary</h5>
+
+    {% if bill %}
+        <p><b>Patient:</b> {{ bill.patient.username }}</p>
+        <p><b>Description:</b> {{ bill.description }}</p>
+        <p><b>Total Amount:</b> ₹ {{ bill.amount }}</p>
+        <p><b>Insurance Covered:</b> ₹ {{ bill.insurance_covered_amount }}</p>
+        <p class="fw-bold text-danger">
+            <b>Amount Due:</b> ₹ {{ bill.amount_due }}
+        </p>
+    {% else %}
+        <p class="text-muted">Bill details not available.</p>
+    {% endif %}
+
+</div>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="card shadow-sm p-4">
+        <h5 class="fw-bold">💳 Payment Details</h5>
+
+        <!-- Amount (READ ONLY, FULL PAYMENT ONLY) -->
+        <div class="mb-3">
+            <label class="form-label">Amount (Full Payment)</label>
+            <input type="text" class="form-control" value="{{ bill.amount_due }}" readonly>
+        </div>
+
+        <!-- Hidden amount field so Django receives value -->
+        <input type="hidden" name="amount" value="{{ bill.amount_due }}">
+
+        <!-- Payment Method -->
+        <div class="mb-3">
+            {{ form.method.label_tag }}
+            {{ form.method }}
+        </div>
+
+        <button class="btn btn-success">Save Payment</button>
+        <a href="{% url 'admin_panel:billing_list' %}" class="btn btn-secondary">Back</a>
+    </div>
+</form>
+
+
+{% endblock %}

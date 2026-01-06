@@ -1,0 +1,19 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<br>
+<br>
+<h2>Approve Appointment</h2>
+
+<p><b>Patient:</b> {{ appointment.patient.get_username}}</p>
+<p><b>Doctor:</b> {{ appointment.doctor.get_username }}</p>
+<p><b>Date:</b> {{ appointment.date }}</p>
+<p><b>Time:</b> {{ appointment.time }}</p>
+<p><b>Reason:</b> {{ appointment.reason }}</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button name="action" value="approve" class="btn btn-success">Approve</button>
+    <button name="action" value="reject" class="btn btn-danger">Reject</button>
+</form>
+
+{% endblock %}

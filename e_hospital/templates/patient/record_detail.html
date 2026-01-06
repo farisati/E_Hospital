@@ -1,0 +1,104 @@
+{% extends 'patient/patient_base.html' %}
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- Page Title -->
+    <h3 class="fw-bold text-primary mb-4">📝 Doctor Diagnosis Summary</h3>
+
+    <!-- Diagnosis Card -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4">
+        <div class="card-body">
+
+            <!-- Diagnosis Title -->
+            <h4 class="fw-bold text-dark mb-3">
+                {{ record.diagnosis|default:"No Diagnosis" }}
+            </h4>
+
+            <!-- Info Section -->
+            <div class="row mb-3">
+                <div class="col-md-6 mb-2">
+                    <strong class="text-secondary">📅 Date:</strong><br>
+                    <span class="text-dark">{{ record.created_at|date:"F j, Y" }}</span>
+                </div>
+
+                <div class="col-md-6 mb-2">
+                    <strong class="text-secondary">👨‍⚕️ Doctor:</strong><br>
+                    <span class="badge bg-light border text-dark px-3 py-2">
+                        Dr. {{ record.doctor.get_full_name|default:record.doctor.username }}
+                    </span>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Notes -->
+            {% if record.notes %}
+            <div class="mb-4">
+                <strong class="text-secondary d-block mb-1">🗒 Notes:</strong>
+                <p class="text-dark">{{ record.notes|linebreaks }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Allergies -->
+            {% if record.allergies %}
+            <div class="mb-4">
+                <strong class="text-secondary d-block mb-1">⚠ Allergies:</strong>
+                <p class="text-dark">{{ record.allergies|linebreaks }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Medications -->
+            {% if record.medications %}
+            <div class="mb-3">
+                <strong class="text-secondary d-block mb-1">💊 Medications:</strong>
+                <p class="text-dark">{{ record.medications|linebreaks }}</p>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <!-- PRESCRIPTIONS SECTION -->
+    <h4 id="prescriptions" class="fw-bold text-secondary mb-3">💊 Prescriptions</h4>
+
+    {% if record.prescriptions.all %}
+        {% for p in record.prescriptions.all %}
+        <div class="card border-0 shadow-sm rounded-3 mb-3">
+            <div class="card-body">
+
+                <!-- Medication Name -->
+                <h5 class="fw-bold text-dark mb-1">
+                    {{ p.medication }}
+                </h5>
+
+                <!-- Instructions -->
+                <p class="text-muted small mb-2">
+                    {{ p.instructions|default:"No instructions provided." }}
+                </p>
+
+                <!-- Date -->
+                <div class="text-end text-muted small">
+                    📅 {{ p.created_at|date:"F j, Y" }}
+                </div>
+
+                <!-- Button -->
+                <div class="text-end mt-2">
+                    <a href="{% url 'patient:prescription_detail' p.id %}"
+                       class="btn btn-primary btn-sm px-4 rounded-pill">
+                        View Full Prescription →
+                    </a>
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-warning text-center py-3 rounded-3 shadow-sm">
+            No Prescriptions Found.
+        </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

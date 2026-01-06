@@ -1,0 +1,52 @@
+{% extends 'patient/patient_base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h3 class="mb-3 text-primary fw-bold">💳 Payment History</h3>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+
+            <table class="table table-bordered table-hover mb-0">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th>Amount (₹)</th>
+                        <th>Method</th>
+                        <th>Status</th>
+                        <th>Transaction ID</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {% for p in payments %}
+                    <tr>
+                        <td class="fw-bold text-success text-center">₹ {{ p.amount }}</td>
+
+                        <td class="text-center">{{ p.get_method_display }}</td>
+
+                        <!-- Only PAID status -->
+                        <td class="text-center">
+                            <span class="badge bg-success">Paid</span>
+                        </td>
+
+                        <td class="text-center">{{ p.transaction_id|default:"-" }}</td>
+                        <td class="text-center">{{ p.paid_at|date:"d M Y h:i A" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-3">
+                            <i class="bi bi-info-circle"></i> No payment records found.
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

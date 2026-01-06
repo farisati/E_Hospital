@@ -1,0 +1,73 @@
+{% extends "doctor/doctor_base.html" %}
+{% block content %}
+
+<div class="container-fluid mt-4">
+
+   
+
+    <!-- ================= MEDICAL HISTORY ================= -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="fw-bold mb-0">🗂 Medical History</h5>
+        </div>
+
+        <div class="card-body">
+
+            {% for record in records %}
+            <div class="border rounded p-3 mb-4">
+
+                <!-- Header -->
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="fw-bold text-primary">
+                        {{ record.created_at|date:"d M Y, h:i A" }}
+                    </span>
+                    <span class="text-muted">
+                        Dr. {{ record.doctor.get_full_name|default:record.doctor.username }}
+                    </span>
+                </div>
+
+                <!-- Details -->
+                <p><b>Diagnosis:</b>
+                    {{ record.diagnosis|default:"—" }}
+                </p>
+
+                <p><b>Medications:</b>
+                    {{ record.medications|linebreaks|default:"—" }}
+                </p>
+
+                <p><b>Allergies:</b>
+                    {{ record.allergies|default:"—" }}
+                </p>
+
+                <p><b>Notes:</b>
+                    {{ record.notes|linebreaks|default:"—" }}
+                </p>
+
+            </div>
+            {% empty %}
+            <div class="text-center text-muted py-4">
+                No medical history available.
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+
+    <!-- ================= ACTIONS ================= -->
+    <div class="mt-4 text-end">
+        <a href="{% url 'doctor:appointment_detail' appointment.id %}"
+           class="btn btn-outline-secondary">
+            ⬅ Back to Appointment
+        </a>
+
+        {% if appointment.status == "pending" %}
+        <a href="{% url 'doctor:start_consultation' appointment.id %}"
+           class="btn btn-primary">
+            ➕ Add New Record
+        </a>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

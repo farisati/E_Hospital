@@ -1,0 +1,32 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+
+<br>
+<br>
+<h2>Admin Dashboard</h2>
+
+<div class="row mt-4">
+    
+    <div class="col-md-4">
+        <div class="card bg-primary text-white p-3">
+            <h4>Total Doctors</h4>
+            <h2>{{ total_doctors }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card bg-success text-white p-3">
+            <h4>Total Patients</h4>
+            <h2>{{ total_patients }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card bg-warning text-dark p-3">
+            <h4>Pending Appointments</h4>
+            <h2>{{ pending_appts }}</h2>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

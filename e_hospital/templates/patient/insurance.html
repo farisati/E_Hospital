@@ -1,0 +1,69 @@
+{% extends 'patient/patient_base.html' %}
+{% block content %}
+
+<div class="container py-4">
+
+    <h3 class="fw-bold text-primary mb-4">
+        <i class="bi bi-shield-check me-2"></i> Insurance Information
+    </h3>
+
+    {% if insurance %}
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white fw-semibold">
+            Active Insurance Details
+        </div>
+
+        <div class="card-body">
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p class="mb-1 text-muted">Provider</p>
+                    <p class="fw-bold">{{ insurance.provider }}</p>
+                </div>
+
+                <div class="col-md-6">
+                    <p class="mb-1 text-muted">Policy Number</p>
+                    <p class="fw-bold">{{ insurance.policy_number }}</p>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <p class="mb-1 text-muted">Coverage Details</p>
+                <p class="fw-semibold">{{ insurance.coverage_details }}</p>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p class="mb-1 text-muted">Coverage Percentage</p>
+                    <p class="fw-bold text-success">{{ insurance.coverage_percent }}%</p>
+                </div>
+
+                <div class="col-md-6">
+                    <p class="mb-1 text-muted">Expiry Date</p>
+                    {% if insurance.expiry_date %}
+                        {% if insurance.expiry_date < today %}
+                            <span class="fw-bold text-danger">{{ insurance.expiry_date }}</span>
+                            <span class="badge bg-danger ms-2">Expired</span>
+                        {% else %}
+                            <span class="fw-bold text-primary">{{ insurance.expiry_date }}</span>
+                            <span class="badge bg-success ms-2">Active</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="fw-bold text-muted">Not Provided</span>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {% else %}
+    <div class="alert alert-warning mt-4 text-center">
+        <i class="bi bi-exclamation-circle me-2"></i>
+        No insurance information available on your account.
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}
