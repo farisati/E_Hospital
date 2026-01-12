@@ -5,7 +5,7 @@ from .models import Profile
 
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
-    role = forms.ChoiceField(choices=[('patient', 'Patient'), ('doctor', 'Doctor')])
+    role = forms.ChoiceField(choices=[('patient', 'Patient')])
 
     class Meta:
         model = User
