@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 
 # ======================================================
 # APP IMPORTS
@@ -28,6 +29,28 @@ from accounts.models import Profile
 # ======================================================
 # AUTH / PERMISSION DECORATOR
 # ======================================================
+
+def doctor_login(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            profile = getattr(user, "profile", None)
+
+            if profile and profile.role == "doctor":
+                login(request, user)
+                return redirect("doctor:dashboard")
+            else:
+                messages.error(request, "Only doctor access allowed.")
+
+        else:
+            messages.error(request, "Invalid username or password")
+
+    return render(request, "doctor/login.html")
+
 def doctor_required(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):

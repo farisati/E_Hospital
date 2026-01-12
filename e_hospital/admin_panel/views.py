@@ -49,7 +49,7 @@ def dashboard(request):
     total_patients = Profile.objects.filter(role='patient').count()
     pending_appts = Appointment.objects.filter(status='pending').count()
 
-    return render(request, "admin/dashboard.html", {
+    return render(request, "admin_panel/dashboard.html", {
         "total_doctors": total_doctors,
         "total_patients": total_patients,
         "pending_appts": pending_appts,
@@ -63,7 +63,7 @@ def dashboard(request):
 @admin_required
 def doctor_list(request):
     doctors = DoctorProfile.objects.select_related("user").all()
-    return render(request, "admin/doctors.html", {"doctors": doctors})
+    return render(request, "admin_panel/doctors.html", {"doctors": doctors})
 
 
 @login_required
@@ -97,7 +97,7 @@ def doctor_add(request):
         user_form = DoctorCreateForm()
         profile_form = DoctorProfileForm()
 
-    return render(request, "admin/doctor_add.html", {
+    return render(request, "admin_panel/doctor_add.html", {
         "user_form": user_form,
         "profile_form": profile_form
     })
@@ -124,7 +124,7 @@ def doctor_edit(request, doctor_id):
         user_form = DoctorCreateForm(instance=user)
         profile_form = DoctorProfileForm(instance=doctor_profile)
 
-    return render(request, "admin/doctor_edit.html", {
+    return render(request, "admin_panel/doctor_edit.html", {
         "user_form": user_form,
         "profile_form": profile_form,
         "doctor": user
@@ -141,7 +141,7 @@ def doctor_delete(request, doctor_id):
         messages.success(request, "Doctor deleted successfully!")
         return redirect("admin_panel:doctor_list")
 
-    return render(request, "admin/confirm_delete.html", {
+    return render(request, "admin_panel/confirm_delete.html", {
         "object": user,
         "type": "Doctor"
     })
@@ -154,7 +154,7 @@ def doctor_delete(request, doctor_id):
 @admin_required
 def patient_list(request):
     patients = Profile.objects.filter(role='patient')
-    return render(request, "admin/patients.html", {"patients": patients})
+    return render(request, "admin_panel/patients.html", {"patients": patients})
 
 
 @login_required
@@ -193,7 +193,7 @@ def patient_add(request):
         messages.success(request, "Patient created successfully!")
         return redirect("admin_panel:patient_list")
 
-    return render(request, "admin/patient_add.html")
+    return render(request, "admin_panel/patient_add.html")
 
 
 @login_required
@@ -226,7 +226,7 @@ def patient_deactivate(request, patient_id):
         messages.success(request, "Patient deactivated successfully!")
         return redirect("admin_panel:patient_list")
 
-    return render(request, "admin/confirm_delete.html", {
+    return render(request, "admin_panel/confirm_delete.html", {
         "object": user,
         "type": "Deactivate Patient"
     })
@@ -262,7 +262,7 @@ def patient_view(request, patient_id):
         "insurance": insurance,
     }
 
-    return render(request, "admin/patient_view.html", context)
+    return render(request, "admin_panel/patient_view.html", context)
 
 
 
@@ -270,12 +270,14 @@ def patient_view(request, patient_id):
 # =====================================================
 # APPOINTMENTS MANAGEMENT
 # =====================================================
+@login_required
+@admin_required
 def appointment_list(request):
     pending = Appointment.objects.filter(status="pending").order_by("date", "time")
     confirmed = Appointment.objects.filter(status="confirmed").order_by("date", "time")
     completed = Appointment.objects.filter(status="completed").order_by("-date")
 
-    return render(request, "admin/appointments.html", {
+    return render(request, "admin_panel/appointments.html", {
         "pending": pending,
         "confirmed": confirmed,
         "completed": completed,
@@ -301,7 +303,7 @@ def approve_appointment(request, pk):
         appt.save()
         return redirect("admin_panel:appointment_list")
 
-    return render(request, "admin/approve_appointment.html", {"appointment": appt})
+    return render(request, "admin_panel/approve_appointment.html", {"appointment": appt})
 
 
 @login_required
@@ -329,7 +331,7 @@ def appointment_detail(request, pk):
 
         return redirect("admin_panel:appointment_list")
 
-    return render(request, "admin/appointment_detail.html", {
+    return render(request, "admin_panel/appointment_detail.html", {
         "appt": appt
     })
 
@@ -355,7 +357,7 @@ def billing_list(request):
     if status:
         bills = bills.filter(status=status)
 
-    return render(request, "admin/billing_list.html", {
+    return render(request, "admin_panel/billing_list.html", {
         "bills": bills,
         "q": q,
         "status": status,
@@ -393,7 +395,7 @@ def billing_create(request):
     else:
         form = BillingForm()
 
-    return render(request, "admin/billing_form.html", {"form": form})
+    return render(request, "admin_panel/billing_form.html", {"form": form})
 
 
 @login_required
@@ -424,7 +426,7 @@ def billing_edit(request, pk):
     else:
         form = BillingForm(instance=bill)
 
-    return render(request, "admin/billing_form.html", {
+    return render(request, "admin_panel/billing_form.html", {
         "form": form,
         "edit": True,
         "bill": bill
@@ -441,7 +443,7 @@ def billing_delete(request, pk):
         messages.success(request, "Bill deleted.")
         return redirect('admin_panel:billing_list')
 
-    return render(request, "admin/confirm_delete.html", {
+    return render(request, "admin_panel/confirm_delete.html", {
         "object": bill,
         "type": "Bill"
     })
@@ -454,7 +456,7 @@ def billing_delete(request, pk):
 @admin_required
 def payments(request):
     pays = Payment.objects.all().order_by('-paid_at')
-    return render(request, "admin/payments.html", {"payments": pays})
+    return render(request, "admin_panel/payments.html", {"payments": pays})
 
 
 @login_required
@@ -489,7 +491,7 @@ def payment_create(request, billing_pk=None):
     else:
         form = PaymentForm(initial=initial)
 
-    return render(request, "admin/payment_form.html", {
+    return render(request, "admin_panel/payment_form.html", {
         "form": form,
         "bill": bill
     })
@@ -502,7 +504,7 @@ def payment_create(request, billing_pk=None):
 @admin_required
 def insurance_list(request):
     insurances = Insurance.objects.select_related("patient").all()
-    return render(request, 'admin/insurance_list.html', {'insurances': insurances})
+    return render(request, 'admin_panel/insurance_list.html', {'insurances': insurances})
 
 
 @login_required
@@ -530,7 +532,7 @@ def insurance_add(request):
         messages.success(request, "Insurance added successfully.")
         return redirect('admin_panel:insurance_list')
 
-    return render(request, 'admin/insurance_add.html', {'users': users})
+    return render(request, 'admin_panel/insurance_add.html', {'users': users})
 
 
 @login_required
@@ -557,7 +559,7 @@ def insurance_edit(request, id):
 
     users = User.objects.all()
 
-    return render(request, 'admin/insurance_edit.html', {
+    return render(request, 'admin_panel/insurance_edit.html', {
         'insurance': insurance,
         'users': users
     })
@@ -573,7 +575,7 @@ def insurance_delete(request, id):
         messages.success(request, "Insurance deleted successfully.")
         return redirect('admin_panel:insurance_list')
 
-    return render(request, "admin/confirm_delete.html", {
+    return render(request, "admin_panel/confirm_delete.html", {
         "object": insurance,
         "type": "Insurance"
     })
@@ -607,7 +609,7 @@ def health_category_list(request):
     categories = HealthCategory.objects.all()
     return render(
         request,
-        "admin/health_category_list.html",
+        "admin_panel/health_category_list.html",
         {"categories": categories}
     )
 
@@ -631,7 +633,7 @@ def health_category_add(request):
 
         messages.error(request, "Category name is required.")
 
-    return render(request, "admin/health_category_form.html")
+    return render(request, "admin_panel/health_category_form.html")
 
 
 @login_required
@@ -665,7 +667,7 @@ def health_resource_list(request):
     resources = HealthResource.objects.select_related("category").order_by("-id")
     return render(
         request,
-        "admin/health_resource_list.html",
+        "admin_panel/health_resource_list.html",
         {"resources": resources}
     )
 
@@ -693,7 +695,7 @@ def health_resource_add(request):
 
     return render(
         request,
-        "admin/health_resource_form.html",
+        "admin_panel/health_resource_form.html",
         {"categories": categories}
     )
 
@@ -720,7 +722,7 @@ def health_resource_edit(request, pk):
 
     return render(
         request,
-        "admin/health_resource_edit.html",
+        "admin_panel/health_resource_edit.html",
         {
             "resource": resource,
             "categories": categories,
@@ -743,6 +745,8 @@ def health_resource_delete(request, pk):
 
     return render(
         request,
-        "admin/health_resource_confirm_delete.html",
+        "admin_panel/health_resource_confirm_delete.html",
         {"resource": resource}
     )
+def admin_panel_home(request):
+    return redirect("admin_panel:dashboard")

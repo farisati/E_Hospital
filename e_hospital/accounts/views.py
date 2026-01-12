@@ -29,19 +29,34 @@ def login_view(request):
         username = request.POST.get("username")
         password = request.POST.get("password")
 
-        user = authenticate(username=username, password=password)
+        user = authenticate(request, username=username, password=password)
 
-        if user:
+        if user is not None:
+
+            if not user.is_active:
+                messages.error(request, "Your account is inactive.")
+                return redirect("accounts:login")
+
             login(request, user)
 
-            if user.profile.role == "patient":
+            profile = getattr(user, "profile", None)
+
+            if not profile:
+                messages.error(request, "User profile not found.")
+                return redirect("accounts:login")
+
+            if profile.role == "patient":
                 return redirect("patient:dashboard")
 
-            elif user.profile.role == "doctor":
+            elif profile.role == "doctor":
                 return redirect("doctor:dashboard")
 
-            else:
+            elif profile.role == "admin":
                 return redirect("admin_panel:dashboard")
+
+            else:
+                messages.error(request, "Invalid user role.")
+                return redirect("accounts:login")
 
         else:
             messages.error(request, "Invalid username or password")
@@ -51,7 +66,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect("accounts:login")
+    return redirect("home")
 
 
 @login_required
@@ -67,3 +82,24 @@ def profile(request):
 
     return render(request, "accounts/profile.html", {"form": form})
 
+def admin_login(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+
+            profile = getattr(user, "profile", None)
+
+            if profile and profile.role == "admin":
+                login(request, user)
+                return redirect("admin_panel:dashboard")
+
+            messages.error(request, "Admin access only")
+
+        else:
+            messages.error(request, "Invalid username or password")
+
+    return render(request, "accounts/admin_login.html")

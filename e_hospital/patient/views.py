@@ -16,10 +16,40 @@ from .models import (
     Payment, Billing, Insurance, HealthCategory, HealthResource
 )
 
+from django.contrib.auth import authenticate, login
+
+
 
 # =====================================================
 # PATIENT ROLE CHECK DECORATOR
 # =====================================================
+
+def patient_login(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+
+            profile = getattr(user, "profile", None)
+
+            # 🔒 Allow ONLY patients
+            if profile and profile.role == "patient":
+                login(request, user)
+                return redirect("patient:dashboard")
+
+            else:
+                messages.error(request, "Only patient access allowed.")
+                return redirect("patient:login")
+
+        else:
+            messages.error(request, "Invalid username or password")
+
+    return render(request, "patient/login.html")
+
+
 def patient_required(view_func):
         @wraps(view_func)
         def wrapper(request, *args, **kwargs):

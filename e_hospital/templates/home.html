@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>E-Hospital | Digital Healthcare System</title>
+    {% load static %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: 500;
+        }
+
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(to right, #76a6f3, #a0a8b5);
+            color: white;
+            padding: 90px 20px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 10px;
+            display: inline-block;
+        }
+
+        .btn-light {
+            background: white;
+            color: #0d6efd;
+        }
+
+        .btn-outline {
+            border: 2px solid white;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Features */
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            padding: 60px 20px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            width: 280px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            color: #0d6efd;
+            margin-bottom: 10px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #0d6efd;
+            color: white;
+            text-align: center;
+            padding: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="logo">🏥 E-Hospital</div>
+        <div>
+            
+            <a href="/patient/login">Patient</a>
+            <a href="{% url 'doctor:login' %}" class="btn">Doctor</a>
+            <a href="{% url 'accounts:admin_login' %}">Admin Panel</a>
+            
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Smart Digital Healthcare System</h1>
+        <a href="/patient/login" class="btn btn-light">Patient Portal</a>
+        <a href="{% url 'doctor:login' %}" class="btn btn-outline">Doctor Portal</a>
+    </section>
+
+    <!-- Features -->
+    <section class="features">
+        <div class="card">
+            <h3>👩‍⚕️ Doctor Management</h3>
+            <p>Organize doctors, schedules, and departments easily.</p>
+        </div>
+        <div class="card">
+            <h3>🧑‍🤝‍🧑 Patient Records</h3>
+            <p>Secure patient data with quick access and updates.</p>
+        </div>
+        <div class="card">
+            <h3>📊 Admin Control</h3>
+            <p>Monitor and manage the entire hospital system.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        © 2026 E-Hospital | Powered by Django
+    </footer>
+
+</body>
+</html>
