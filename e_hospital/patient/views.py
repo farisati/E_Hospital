@@ -369,7 +369,7 @@ def pay_bill(request, pk):
             }
         ],
         mode="payment",
-        success_url=settings.STRIPE_SUCCESS_URL + f"?bill_id={bill.id}",
+        success_url=f"{settings.STRIPE_SUCCESS_URL}?bill_id={bill.id}",
         cancel_url=settings.STRIPE_CANCEL_URL,
     )
 
