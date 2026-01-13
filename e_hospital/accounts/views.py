@@ -90,9 +90,13 @@ def admin_login(request):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
+            
+            if user.is_superuser:
+                login(request, user)
+                return redirect("admin_panel:dashboard")
 
+            
             profile = getattr(user, "profile", None)
-
             if profile and profile.role == "admin":
                 login(request, user)
                 return redirect("admin_panel:dashboard")

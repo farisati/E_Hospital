@@ -22,27 +22,30 @@ from doctor.forms import DoctorCreateForm, DoctorProfileForm
 # =====================================================
 
 def admin_required(view_func):
-        @wraps(view_func)
-        def wrapper(request, *args, **kwargs):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
 
-            if not request.user.is_authenticated:
-                return redirect("accounts:login")
+        if not request.user.is_authenticated:
+            return redirect("accounts:admin_login")
 
-            profile = getattr(request.user, "profile", None)
-
-            if not profile or profile.role != "admin":
-                messages.error(request, "Access denied.")
-                return redirect("accounts:login")
-
+        # ✅ ALLOW SUPERUSER
+        if request.user.is_superuser:
             return view_func(request, *args, **kwargs)
-        return wrapper
 
+        profile = getattr(request.user, "profile", None)
+
+        if profile and profile.role == "admin":
+            return view_func(request, *args, **kwargs)
+
+        messages.error(request, "Access denied.")
+        return redirect("accounts:login")
+
+    return wrapper
 
 
 # =====================================================
 # ADMIN DASHBOARD
 # =====================================================
-@login_required
 @admin_required
 def dashboard(request):
     total_doctors = Profile.objects.filter(role='doctor').count()
@@ -59,14 +62,14 @@ def dashboard(request):
 # =====================================================
 # DOCTOR MANAGEMENT
 # =====================================================
-@login_required
+
 @admin_required
 def doctor_list(request):
     doctors = DoctorProfile.objects.select_related("user").all()
     return render(request, "admin_panel/doctors.html", {"doctors": doctors})
 
 
-@login_required
+
 @admin_required
 def doctor_add(request):
     if request.method == "POST":
@@ -103,7 +106,7 @@ def doctor_add(request):
     })
 
 
-@login_required
+
 @admin_required
 def doctor_edit(request, doctor_id):
     user = get_object_or_404(User, id=doctor_id)
@@ -131,7 +134,7 @@ def doctor_edit(request, doctor_id):
     })
 
 
-@login_required
+
 @admin_required
 def doctor_delete(request, doctor_id):
     user = get_object_or_404(User, id=doctor_id)
@@ -150,14 +153,14 @@ def doctor_delete(request, doctor_id):
 # =====================================================
 # PATIENT MANAGEMENT
 # =====================================================
-@login_required
+
 @admin_required
 def patient_list(request):
     patients = Profile.objects.filter(role='patient')
     return render(request, "admin_panel/patients.html", {"patients": patients})
 
 
-@login_required
+
 @admin_required
 def patient_add(request):
     if request.method == "POST":
@@ -196,7 +199,7 @@ def patient_add(request):
     return render(request, "admin_panel/patient_add.html")
 
 
-@login_required
+
 @admin_required
 def patient_edit(request, patient_id):
     profile = get_object_or_404(Profile, user_id=patient_id, role="patient")
@@ -212,10 +215,9 @@ def patient_edit(request, patient_id):
         messages.success(request, "Patient updated successfully!")
         return redirect("admin_panel:patient_list")
 
-    return render(request, "admin/patient_edit.html", {"profile": profile})
+    return render(request, "admin_panel/patient_edit.html", {"profile": profile})
 
 
-@login_required
 @admin_required
 def patient_deactivate(request, patient_id):
     user = get_object_or_404(User, id=patient_id)
@@ -232,7 +234,7 @@ def patient_deactivate(request, patient_id):
     })
 
 
-@login_required
+
 @admin_required
 def patient_activate(request, user_id):
     user = get_object_or_404(User, id=user_id)
@@ -242,7 +244,7 @@ def patient_activate(request, user_id):
     return redirect("admin_panel:patient_list")
 
 
-@login_required
+
 @admin_required
 def patient_view(request, patient_id):
     profile = get_object_or_404(Profile, user__id=patient_id)
@@ -270,7 +272,7 @@ def patient_view(request, patient_id):
 # =====================================================
 # APPOINTMENTS MANAGEMENT
 # =====================================================
-@login_required
+
 @admin_required
 def appointment_list(request):
     pending = Appointment.objects.filter(status="pending").order_by("date", "time")
@@ -284,7 +286,7 @@ def appointment_list(request):
     })
 
 
-@login_required
+
 @admin_required
 def approve_appointment(request, pk):
     appt = get_object_or_404(Appointment, pk=pk)
@@ -306,7 +308,7 @@ def approve_appointment(request, pk):
     return render(request, "admin_panel/approve_appointment.html", {"appointment": appt})
 
 
-@login_required
+
 @admin_required
 def appointment_detail(request, pk):
     appt = get_object_or_404(Appointment, pk=pk)
@@ -339,7 +341,7 @@ def appointment_detail(request, pk):
 # =====================================================
 # BILLING MANAGEMENT
 # =====================================================
-@login_required
+
 @admin_required
 def billing_list(request):
     q = request.GET.get('q', '')
@@ -365,7 +367,6 @@ def billing_list(request):
     })
 
 
-@login_required
 @admin_required
 def billing_create(request):
     if request.method == 'POST':
@@ -398,7 +399,7 @@ def billing_create(request):
     return render(request, "admin_panel/billing_form.html", {"form": form})
 
 
-@login_required
+
 @admin_required
 def billing_edit(request, pk):
     bill = get_object_or_404(Billing, pk=pk)
@@ -433,7 +434,7 @@ def billing_edit(request, pk):
     })
 
 
-@login_required
+
 @admin_required
 def billing_delete(request, pk):
     bill = get_object_or_404(Billing, pk=pk)
@@ -452,14 +453,14 @@ def billing_delete(request, pk):
 # =====================================================
 # PAYMENT
 # =====================================================
-@login_required
+
 @admin_required
 def payments(request):
     pays = Payment.objects.all().order_by('-paid_at')
     return render(request, "admin_panel/payments.html", {"payments": pays})
 
 
-@login_required
+
 @admin_required
 def payment_create(request, billing_pk=None):
     bill = None
@@ -500,14 +501,14 @@ def payment_create(request, billing_pk=None):
 # =====================================================
 # INSURANCE MANAGEMENT
 # =====================================================
-@login_required
+
 @admin_required
 def insurance_list(request):
     insurances = Insurance.objects.select_related("patient").all()
     return render(request, 'admin_panel/insurance_list.html', {'insurances': insurances})
 
 
-@login_required
+
 @admin_required
 def insurance_add(request):
     insured_patients = Insurance.objects.values_list("patient_id", flat=True)
@@ -535,7 +536,6 @@ def insurance_add(request):
     return render(request, 'admin_panel/insurance_add.html', {'users': users})
 
 
-@login_required
 @admin_required
 def insurance_edit(request, id):
     insurance = get_object_or_404(Insurance, id=id)
@@ -565,7 +565,7 @@ def insurance_edit(request, id):
     })
 
 
-@login_required
+
 @admin_required
 def insurance_delete(request, id):
     insurance = get_object_or_404(Insurance, id=id)
@@ -581,7 +581,7 @@ def insurance_delete(request, id):
     })
 
 
-@login_required
+
 @admin_required
 def get_insurance(request, patient_id):
     insurance = Insurance.objects.filter(patient_id=patient_id).first()
@@ -600,7 +600,7 @@ def get_insurance(request, patient_id):
 # HEALTH CATEGORIES MANAGEMENT
 # =====================================================
 
-@login_required
+
 @admin_required
 def health_category_list(request):
     """
@@ -614,7 +614,7 @@ def health_category_list(request):
     )
 
 
-@login_required
+
 @admin_required
 def health_category_add(request):
     """
@@ -636,7 +636,6 @@ def health_category_add(request):
     return render(request, "admin_panel/health_category_form.html")
 
 
-@login_required
 @admin_required
 def health_category_toggle(request, pk):
     """
@@ -658,7 +657,7 @@ def health_category_toggle(request, pk):
 # HEALTH RESOURCES MANAGEMENT
 # =====================================================
 
-@login_required
+
 @admin_required
 def health_resource_list(request):
     """
@@ -672,7 +671,7 @@ def health_resource_list(request):
     )
 
 
-@login_required
+
 @admin_required
 def health_resource_add(request):
     """
@@ -700,7 +699,6 @@ def health_resource_add(request):
     )
 
 
-@login_required
 @admin_required
 def health_resource_edit(request, pk):
     """
@@ -730,7 +728,7 @@ def health_resource_edit(request, pk):
     )
 
 
-@login_required
+
 @admin_required
 def health_resource_delete(request, pk):
     """
@@ -748,5 +746,7 @@ def health_resource_delete(request, pk):
         "admin_panel/health_resource_confirm_delete.html",
         {"resource": resource}
     )
+
+@admin_required
 def admin_panel_home(request):
     return redirect("admin_panel:dashboard")
